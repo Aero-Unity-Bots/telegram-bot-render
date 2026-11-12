@@ -1,13 +1,16 @@
 {
   "name": "telegram-hybrid-bot",
   "version": "1.0.0",
-  "description": "Telegram Bot with Botpress RAG, Gemini AI, Dictionary API, and Force-Sub for Render",
+  "description": "Telegram Bot with Gemini AI, Dictionary API, and Force-Sub for Render",
   "main": "server.js",
+  "engines": {
+    "node": ">=22.0.0"
+  },
   "scripts": {
     "start": "node server.js"
   },
   "dependencies": {
-    "@google/genai": "^0.1.2",
+    "@google/genai": "latest",
     "axios": "^1.7.7",
     "dotenv": "^16.4.5",
     "express": "^4.21.0",
