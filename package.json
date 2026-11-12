@@ -1,14 +1,16 @@
 {
-  "name": "telegram-bot-render",
+  "name": "telegram-hybrid-bot",
   "version": "1.0.0",
-  "description": "Telegram bot with dynamic force subscription, stats, and webhooks for Render",
+  "description": "Telegram Bot with Botpress RAG, Gemini AI, Dictionary API, and Force-Sub for Render",
   "main": "server.js",
   "scripts": {
     "start": "node server.js"
   },
   "dependencies": {
-    "dotenv": "^16.4.0",
-    "express": "^4.19.2",
-    "node-telegram-bot-api": "^0.65.0"
+    "@google/genai": "^0.1.2",
+    "axios": "^1.7.7",
+    "dotenv": "^16.4.5",
+    "express": "^4.21.0",
+    "node-telegram-bot-api": "^0.66.0"
   }
 }
