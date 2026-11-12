@@ -108,7 +108,7 @@ async function askGemini(text) {
     if (!ai) return null;
     try {
         const response = await ai.models.generateContent({
-            model: 'gemini-2.5-flash',
+            model: 'gemini-3.8-flash', // <--- UPDATED MODEL
             contents: text,
             config: {
                 systemInstruction: 'You are a helpful, concise Telegram assistant. Keep answers clear and well-formatted for mobile screens.'
