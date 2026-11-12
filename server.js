@@ -104,21 +104,38 @@ async function askBotpress(chatId, userName, text) {
 }
 
 // 3. Gemini AI Query Helper
-async function askGemini(text) {
+async function askGemini(text, retries = 3, delay = 2000) {
     if (!ai) return null;
-    try {
-        const response = await ai.models.generateContent({
-            model: 'gemini-3.8-flash', // <--- UPDATED MODEL
-            contents: text,
-            config: {
-                systemInstruction: 'You are a helpful, concise Telegram assistant. Keep answers clear and well-formatted for mobile screens.'
+    
+    for (let attempt = 1; attempt <= retries; attempt++) {
+        try {
+            const response = await ai.models.generateContent({
+                model: 'gemini-3.8-flash',
+                contents: text,
+                config: {
+                    systemInstruction: 'You are a helpful, concise Telegram assistant. Keep answers clear and well-formatted for mobile screens.'
+                }
+            });
+            return response.text;
+        } catch (error) {
+            console.error(`Gemini API Attempt ${attempt} Failed:`, error.message);
+            
+            // If it's a 503 (high demand) and we have retries left, wait and try again
+            if (error.message.includes('503') || error.message.includes('UNAVAILABLE')) {
+                if (attempt < retries) {
+                    console.log(`Retrying in ${delay / 1000} seconds...`);
+                    await new Promise(resolve => setTimeout(resolve, delay));
+                    delay *= 2; // Exponential backoff
+                    continue;
+                }
             }
-        });
-        return response.text;
-    } catch (error) {
-        console.error('Gemini API Error:', error.message);
-        return null;
+            
+            // If it's a different error or out of retries, break out
+            break;
+        }
     }
+    
+    return "⚠️ The AI model is currently experiencing heavy traffic (503 High Demand). Please wait a moment and try your query again!";
 }
 
 // --- WEBHOOK ENDPOINT ---
