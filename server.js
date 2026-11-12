@@ -104,39 +104,34 @@ async function askBotpress(chatId, userName, text) {
 }
 
 // 3. Gemini AI Query Helper
-async function askGemini(text, retries = 3, delay = 2000) {
+async function askGemini(text) {
     if (!ai) return null;
     
-    for (let attempt = 1; attempt <= retries; attempt++) {
+    // Try the latest model first, then fallback to stable baseline models if 503 occurs
+    const modelsToTry = ['gemini-3.8-flash', 'gemini-2.0-flash', 'gemini-1.5-flash'];
+    
+    for (const modelName of modelsToTry) {
         try {
             const response = await ai.models.generateContent({
-                model: 'gemini-3.8-flash',
+                model: modelName,
                 contents: text,
                 config: {
                     systemInstruction: 'You are a helpful, concise Telegram assistant. Keep answers clear and well-formatted for mobile screens.'
                 }
             });
-            return response.text;
-        } catch (error) {
-            console.error(`Gemini API Attempt ${attempt} Failed:`, error.message);
-            
-            // If it's a 503 (high demand) and we have retries left, wait and try again
-            if (error.message.includes('503') || error.message.includes('UNAVAILABLE')) {
-                if (attempt < retries) {
-                    console.log(`Retrying in ${delay / 1000} seconds...`);
-                    await new Promise(resolve => setTimeout(resolve, delay));
-                    delay *= 2; // Exponential backoff
-                    continue;
-                }
+            if (response && response.text) {
+                return response.text;
             }
-            
-            // If it's a different error or out of retries, break out
-            break;
+        } catch (error) {
+            console.warn(`Model ${modelName} failed:`, error.message);
+            // If it's a 503 or unavailable, loop continues to the next fallback model
+            continue;
         }
     }
     
-    return "⚠️ The AI model is currently experiencing heavy traffic (503 High Demand). Please wait a moment and try your query again!";
+    return "⚠️ Google's AI servers are currently experiencing heavy traffic across all models. Please try your request again in a minute!";
 }
+
 
 // --- WEBHOOK ENDPOINT ---
 
